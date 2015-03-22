@@ -97,8 +97,8 @@ There are two kinds of settings: those having to do with the slides and those mo
   * 1024 × 768
 - `nextTitle` *'Next'*: tooltip text for 'Next' button.
 - `prevTitle` *'Previous'*: tooltip text for 'Previous' button.
-- `skipFTitle` *'Skip to last slide'*: tooltip text for 'Skip forward' button.
-- `skipBTitle` *'Skip to first slide'*: tooltip text for 'Skip back' button.
+- `skipFTitle` *'Skip to last slide'*: tooltip text for 'Skip forward' button. If set to "", the button is not rendered.
+- `skipBTitle` *'Skip to first slide'*: tooltip text for 'Skip back' button.. If set to "", the button is not rendered.
 - `fadeDuration` *0*: time length of all fade-in effects in milliseconds. It corresponds to the `duration` parameter of jQuery's fadeIn and fadeOut functions. If equal to `0`, there's no fading effect.
 - `seqLoad` *true*: if enabled, multiple slides are forced to be downloaded and displayed according to slide number. Set to `false` for better performance.
 - `lazyLoad` *{}*: options for lazy loading the first slide. Equivalent to the object passed to the `lazyload()` function. If `false`, Lazy Load is not used even if present.
@@ -113,6 +113,7 @@ There are two kinds of settings: those having to do with the slides and those mo
 - `timeoutErr` *'The connection has timed out'*: error message displayed after timeout.
 - `missAttrErr` *'Missing expected attribute "data-src"'*: error message displayed when no `data-src` attribute is found.
 - `timeout` *15000*: timeout in milliseconds for the request to the oEmbed service.
+- `afterSlideChange` *function () {}*: callback after finishing navigating to a new slide, passes two arguments `this` (PicoSlides instance) and `[current_slide, total_slides]` (array of current indexes)
 
 #### Element-related: attributes, loading indicator and CSS styles.
 
