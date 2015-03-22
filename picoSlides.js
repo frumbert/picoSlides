@@ -290,7 +290,9 @@
             loadAll: function () {},    //Callback after loading all of the slides
             timeoutErr: 'The connection has timed out',
             missAttrErr: 'Missing expected attribute "data-src"',
-            timeout: 15000
+            timeout: 15000,
+
+            afterSlideChange: function () {}   // called after slide change ends
         },
 
         /**
@@ -363,7 +365,8 @@
          * @param changeLink: true if link changes according to slide number
          */
         fadeInSlide: function (newSlide, changeLink) {
-            var newSlideNum;    //number of slide to be displayed
+            var newSlideNum,    //number of slide to be displayed
+                _this = this;    
 
             //Slide to display is first or last one? => prev arrow or next arrow hidden respectively
             if (newSlide.className.match(/\bfirstSlide\b/)) {
@@ -392,7 +395,10 @@
             newSlide.style.visibility = 'visible';
 
             //Fades corresponding slide in.
-            $(newSlide).fadeTo(this.settings.fadeDuration, 0.99); //final opacity = .99 to avoid flicker on Firefox (bug 187608)
+            $(newSlide).fadeTo(this.settings.fadeDuration, 0.99, function () {
+                var counter = $(this).closest(".containerSlide").find(".countSlide").text().split("/"); // obviously not ideal, contains[ index, total ]
+                _this.settings.afterSlideChange.call(_this,_this, counter);
+            }); //final opacity = .99 to avoid flicker on Firefox (bug 187608)
 
             //Hides slide on display and update slideset's pointer to current slide.
             this.currentSlide.style.visibility = 'hidden';
@@ -516,14 +522,18 @@
                             docFrag.appendChild(newElem);
 
                             //Creates element for 'skip forward' button and sets it up for insertion
-                            newElem = elementLib.$skipF[0].cloneNode(true);
-                            newElem.title = _this.settings.skipFTitle;
-                            docFrag.appendChild(newElem);
+                            if (_this.settings.skipFTitle.length>0) {
+                                newElem = elementLib.$skipF[0].cloneNode(true);
+                                newElem.title = _this.settings.skipFTitle;
+                                docFrag.appendChild(newElem);
+                            }
 
                             //Creates element for 'skip back' button and sets it up for insertion
-                            newElem = elementLib.$skipB[0].cloneNode(true);
-                            newElem.title = _this.settings.skipBTitle;
-                            docFrag.appendChild(newElem);
+                            if (_this.settings.skipBTitle.length>0) {
+                                newElem = elementLib.$skipB[0].cloneNode(true);
+                                newElem.title = _this.settings.skipBTitle;
+                                docFrag.appendChild(newElem);
+                            }
 
                             //Inserts newly created elements into DOM
                             _this.elem.insertBefore(docFrag, this);
