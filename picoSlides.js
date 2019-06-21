@@ -34,7 +34,7 @@
             cssFgColor: 'white',    //Foreground colour for text and control symbols
             cssSeparation: '1.5%',  //Default separation between edge of slides container and controls
             cssRadius: '0px',       //Border radius of all elements
-            cssOpacity: 0.65        //Opacity of all interface elements
+            cssOpacity: 0.90        //Opacity of all interface elements
         };
 
     /**
