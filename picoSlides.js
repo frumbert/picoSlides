@@ -33,7 +33,7 @@
             cssBgColor: 'gray',     //Background colour for controls and main container
             cssFgColor: 'white',    //Foreground colour for text and control symbols
             cssSeparation: '1.5%',  //Default separation between edge of slides container and controls
-            cssRadius: '0px',       //Border radius of all elements
+            cssRadius: '2px',       //Border radius of all elements
             cssOpacity: 0.65,       //Opacity of all interface elements
             cssBorder: '1px solid rgba(0,0,0,.5)',
             cssShadow: '0 0 5px rgba(0,0,0,.2)',
@@ -153,10 +153,10 @@
         countElem.style.right = '25%';
         countElem.style.backgroundColor = 'transparent';
         countElem.style.cursor = 'default';
-        countElem.style.border = elementDefs.cssBorder;
         countElem.innerHTML = '<span><span>1</span><b>/</b></span>';
 
         countChild = countElem.firstChild;
+        countChild.style.border = elementDefs.cssBorder;
         countChild.style.display = 'inline-block';
         countChild.style.padding = '0 ' + elementDefs.cssPadding;
         countChild.style.lineHeight = elementDefs.cssLineHeight;
