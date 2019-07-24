@@ -34,7 +34,10 @@
             cssFgColor: 'white',    //Foreground colour for text and control symbols
             cssSeparation: '1.5%',  //Default separation between edge of slides container and controls
             cssRadius: '0px',       //Border radius of all elements
-            cssOpacity: 0.65        //Opacity of all interface elements
+            cssOpacity: 0.65,       //Opacity of all interface elements
+            cssBorder: '1px solid rgba(0,0,0,.5)',
+            cssShadow: '0 0 5px rgba(0,0,0,.2)',
+            cssTransition: 'all .3s ease'
         };
 
     /**
@@ -75,6 +78,7 @@
             container.style.color = elementDefs.cssFgColor;
             container.style.background = 'url("' + elementDefs.loadingImg + '") center center no-repeat ' + elementDefs.cssBgColor;
             container.style.borderRadius = elementDefs.cssRadius;
+            container.style.boxShadow = elementDefs.cssShadow;
             $(container).css(noSelect);
             return;
         }
@@ -92,7 +96,11 @@
             'line-height': elementDefs.cssButtonSize,
             'font-size': 0.1,       //in IE9, a font-size of 0 still seems not to force line-height
             'text-align': 'center',
-            'border-radius': elementDefs.cssButtonSize
+            'border-radius': elementDefs.cssButtonSize,
+
+            'box-shadow': elementDefs.cssShadow,
+            'border': elementDefs.cssBorder,
+            'transition': elementDefs.cssTransition
         }, noSelect);
 
         buttonSize = parseInt(elementDefs.cssButtonSize, 10);
@@ -145,7 +153,7 @@
         countElem.style.right = '25%';
         countElem.style.backgroundColor = 'transparent';
         countElem.style.cursor = 'default';
-        countElem.innerHTML = '<span><span>1</span>/</span>';
+        countElem.innerHTML = '<span><span>1</span><b>/</b></span>';
 
         countChild = countElem.firstChild;
         countChild.style.display = 'inline-block';
@@ -303,7 +311,7 @@
         init: function () {
             this.settings = $.extend({}, this.defaults, this.options, this.metadata);
             elementLibrary(this.elem);
-            this.getCover();
+            this.getCover(this.settings.startAt);
             this.elem.thisRef = this;
             //The thisRef is for later use within onload event handlers (see 'onLoadHandler' function)
             //This is to avoid creating a function object for event handlers inside a for loop (see 'scaffolding' function).
@@ -407,14 +415,12 @@
             this.currentSlide = newSlide;
         },
 
-        /*
-         * public method for loading a slide, usually used on load
-         * e.g. if you have picoSlides already initialised on #slides, you can
-         * $("#slides").picoslides("gotoSlide", 5);
-         */
         gotoSlide: function (index) {
+            // console.log("gotoSlide",this.$elem.children("img:eq("+index+")"),index);
+            // this.fadeInSlide(this.$elem.children("img:eq("+index+")").get()[0], false);
             var slide = this.elem.querySelectorAll("img")[index-1];
             if (slide && slide.hasAttribute("data-src")) slide.setAttribute('src', slide.getAttribute('data-src'));
+            // console.log("slide",slide,this.elem,this,index,slide[index]);
             this.fadeInSlide(slide, false);
         },
 
@@ -460,7 +466,6 @@
             $firstSlide = $(this.currentSlide);
             docFrag.appendChild(this.currentSlide);
 
-            // if startAt is set you have to prebuild the img objects, rather than doing them on click
             if (this.settings.startAt > 1) {
                 if (_this.settings.seqLoad) {
                     srcAttr = 'data-src';
