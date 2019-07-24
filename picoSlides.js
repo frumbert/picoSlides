@@ -1,4 +1,4 @@
-/* picoSlides v1.0.1
+/* picoSlides v1.1
  * Copyright (c) 2014 Hector Quintero Casanova
  * Released under the MIT license
  */
@@ -292,7 +292,8 @@
             missAttrErr: 'Missing expected attribute "data-src"',
             timeout: 15000,
 
-            afterSlideChange: function () {}   // called after slide change ends
+            afterSlideChange: function () {},   // called after slide change ends
+            startAt: 1                 // index of first slide to load (range: 1 - total)
         },
 
         /**
@@ -366,7 +367,7 @@
          */
         fadeInSlide: function (newSlide, changeLink) {
             var newSlideNum,    //number of slide to be displayed
-                _this = this;    
+                _this = this;
 
             //Slide to display is first or last one? => prev arrow or next arrow hidden respectively
             if (newSlide.className.match(/\bfirstSlide\b/)) {
@@ -406,6 +407,17 @@
             this.currentSlide = newSlide;
         },
 
+        /*
+         * public method for loading a slide, usually used on load
+         * e.g. if you have picoSlides already initialised on #slides, you can
+         * $("#slides").picoslides("gotoSlide", 5);
+         */
+        gotoSlide: function (index) {
+            var slide = this.elem.querySelectorAll("img")[index-1];
+            if (slide && slide.hasAttribute("data-src")) slide.setAttribute('src', slide.getAttribute('data-src'));
+            this.fadeInSlide(slide, false);
+        },
+
         /**
          *  Adds required HTML, displays controls and attaches to them event listeners for deferred loading
          *  and slide navigation.
@@ -423,7 +435,8 @@
                 heightSlide,    //Height of slide image (as calculated from the width and aspect ratio)
                 totalSlides,    //Number of slides as obtained from Oembed API
                 _this,          //backup reference to picoSlides object (for use within functions)
-                i;
+                i,
+                buffered;
 
             //Initialisations
             docFrag = document.createDocumentFragment();
@@ -434,6 +447,7 @@
             totalSlides = data.total_slides;
             this.toLoad = totalSlides;
             _this = this;
+            buffered = false;
 
             //Feedback: show loading indicator (centered on image) and wait cursor
             this.loading(true);
@@ -445,6 +459,22 @@
             this.currentSlide.setAttribute(elementDefs.lazyAttr, data.slide_image_baseurl + '1' + urlSuffix);
             $firstSlide = $(this.currentSlide);
             docFrag.appendChild(this.currentSlide);
+
+            // if startAt is set you have to prebuild the img objects, rather than doing them on click
+            if (this.settings.startAt > 1) {
+                if (_this.settings.seqLoad) {
+                    srcAttr = 'data-src';
+                } else {
+                    srcAttr = 'src';
+                }
+                for (i = 2; i <= totalSlides; i += 1) {
+                    newElem = elementLib.slide.cloneNode(false);
+                    newElem.setAttribute(srcAttr, data.slide_image_baseurl + i + urlSuffix);
+                    newElem.onload = _this.onLoadHandler;
+                    docFrag.appendChild(newElem);
+                }
+                buffered = true;
+            }
 
             controlNext = elementLib.$next[0].cloneNode(true);
             controlNext.title = this.settings.nextTitle;
@@ -498,19 +528,21 @@
                             _this.loading(true);
                             docFrag = document.createDocumentFragment();
 
-                            //Prevents image load if sequential mode enabled
-                            if (_this.settings.seqLoad) {
-                                srcAttr = 'data-src';
-                            } else {
-                                srcAttr = 'src';
-                            }
+                            if (!buffered) {
+                                //Prevents image load if sequential mode enabled
+                                if (_this.settings.seqLoad) {
+                                    srcAttr = 'data-src';
+                                } else {
+                                    srcAttr = 'src';
+                                }
 
-                            //Create the DOM elements, seting each image's URL accordingly
-                            for (i = 2; i <= totalSlides; i += 1) {
-                                newElem = elementLib.slide.cloneNode(false);
-                                newElem.setAttribute(srcAttr, data.slide_image_baseurl + i + urlSuffix);
-                                newElem.onload = _this.onLoadHandler;
-                                docFrag.appendChild(newElem);
+                                //Create the DOM elements, seting each image's URL accordingly
+                                for (i = 2; i <= totalSlides; i += 1) {
+                                    newElem = elementLib.slide.cloneNode(false);
+                                    newElem.setAttribute(srcAttr, data.slide_image_baseurl + i + urlSuffix);
+                                    newElem.onload = _this.onLoadHandler;
+                                    docFrag.appendChild(newElem);
+                                }
                             }
 
                             //Mark last slide image out
@@ -658,15 +690,26 @@
                 _this.$elem.html(_this.settings.missAttrErr);
             }
         }
+
     };
 
     //Adds the plugin to the jQuery.fn object
     $.fn.picoSlides = function (slideOps) {
-        elementLibrary();    //populates the library once for all subsequent PicoSlides instances
-        setsToLoad = this.length;
-        return this.each(function () {
-            new PicoSlides(this, slideOps).init();
-        });
+        if (typeof slideOps === "string" && $(this).data("_inst") && $(this).data("_inst")[slideOps]) {
+            return $(this).data("_inst")[slideOps].apply($(this).data("_inst"), Array.prototype.slice.call( arguments, 1 ));
+
+        } else if ( typeof slideOps === 'object' || ! slideOps ) {
+            elementLibrary();    //populates the library once for all subsequent PicoSlides instances
+            setsToLoad = this.length;
+            return this.each(function (index,instance) {
+                var p = new PicoSlides(this, slideOps).init();
+                $(instance).data({"_inst":p});
+                return p;
+            });
+
+        } else {
+            $.error( 'Method ' +  slideOps + ' does not exist on jQuery.picoSlides' );
+        }
     };
 
     //Exposes the PicoSlides object and makes all default values public
