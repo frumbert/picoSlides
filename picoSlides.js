@@ -153,6 +153,7 @@
         countElem.style.right = '25%';
         countElem.style.backgroundColor = 'transparent';
         countElem.style.cursor = 'default';
+        countElem.style.border = elementDefs.cssBorder;
         countElem.innerHTML = '<span><span>1</span><b>/</b></span>';
 
         countChild = countElem.firstChild;
