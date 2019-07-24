@@ -8,6 +8,8 @@ Purpose of this fork
 
 This code differs in that it has a new public method `$inst.gotoSlide(index)` which allows you to externally direct the presentation to a particular slide.
 
+It also slightly changes the default style of buttons to make them stand out more
+
 
 Example
 -------
