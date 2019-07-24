@@ -5,10 +5,11 @@
   "homepage": "http://hqcasanova.github.io/picoSlides/",
   "repository": {
     "type": "git",
-    "url": "git://github.com/hqcasanova/picoSlides.git"
+    "url": "git://github.com/frumbert/picoSlides.git"
   },
   "authors": [
-    "hqcasanova <hqcasanova@yahoo.com>"
+    "hqcasanova <hqcasanova@yahoo.com>",
+    "frumbert <me@frumbert.org>"
   ],
   "description": "A responsive jQuery plugin for IFRAME-free embedding and simple navigation of SlideShare presentations",
   "moduleType": [
